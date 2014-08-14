@@ -1460,7 +1460,6 @@ vshCommandOpt(const vshCmd *cmd, const char *name, vshCmdOpt **opt,
     while (candidate) {
 		printf("virsh.c vshCommnadOpt candidate while\n");//syscore
         if (STREQ(candidate->def->name, name)) {
-			printf("virsh.c vshCommnadOpt STREQ Call\n");//syscore
             *opt = candidate;
             ret = 1;
             break;

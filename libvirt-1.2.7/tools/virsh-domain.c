@@ -4613,16 +4613,16 @@ doDump(void *opaque)
         flags |= VIR_DUMP_RESET;
     if (vshCommandOptBool(cmd, "memory-only"))
         flags |= VIR_DUMP_MEMORY_ONLY;
-	printf("vshCommandOptBool before in \n");
+	printf("vshCommandOptBool before in \n");//syscore
     if (vshCommandOptBool(cmd, "format")) {
 		printf("vshCommandOptBool Call\n");//syscore
         if (!(flags & VIR_DUMP_MEMORY_ONLY)) {
             vshError(ctl, "%s", _("--format only works with --memory-only"));
             goto out;
         }
-
+			printf("vshCommandOptString before in \n");//syscore
         if (vshCommandOptString(cmd, "format", &format)) {
-				printf("vshCommandOptString Call\n");//syscore
+				printf("STREQ Call\n");//syscore
             if (STREQ(format, "kdump-zlib")) {
                 dumpformat = VIR_DOMAIN_CORE_DUMP_FORMAT_KDUMP_ZLIB;
             } else if (STREQ(format, "kdump-lzo")) {
@@ -4641,12 +4641,13 @@ doDump(void *opaque)
     }
 	
     if (dumpformat != VIR_DOMAIN_CORE_DUMP_FORMAT_RAW) {
-        if (virDomainCoreDumpWithFormat(dom, to, dumpformat, flags) < 0) {
 			printf("virDomainCoreDumpWithFormat Call\n");//syscore
+        if (virDomainCoreDumpWithFormat(dom, to, dumpformat, flags) < 0) {
             vshError(ctl, _("Failed to core dump domain %s to %s"), name, to);
             goto out;
         }
     } else {
+		printf("virDomainCoreDump Call\n");//syscore
         if (virDomainCoreDump(dom, to, flags) < 0) {
 			printf("virDomainCoreDump Call\n");//syscore
             vshError(ctl, _("Failed to core dump domain %s to %s"), name, to);
@@ -4657,12 +4658,16 @@ doDump(void *opaque)
     ret = '0';
  out:
 	 printf("out Call\n");//syscore
-    pthread_sigmask(SIG_SETMASK, &oldsigmask, NULL);
+	 printf("Remove sigmask Call\n");//syscore
+	 //pthread_sigmask(SIG_SETMASK, &oldsigmask, NULL);
  out_sig:
     if (dom){
 		printf("out_sig Call\n");//syscore
-        virDomainFree(dom);}
-    ignore_value(safewrite(data->writefd, &ret, sizeof(ret)));
+		
+      virDomainFree(dom);
+	   }
+	   printf("remove  ignore_value Call\n");//syscore
+		ignore_value(safewrite(data->writefd, &ret, sizeof(ret)));//지울려니까 오류뜸ㄴ
 }
 
 static bool
