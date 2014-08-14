@@ -3008,7 +3008,7 @@ virDomainCoreDump(virDomainPtr domain, const char *to, unsigned int flags)
         }
 			printf("ibvirt.c virDomainCoreDump-domainCoreDump Call \n");//syscore
         ret = conn->driver->domainCoreDump(domain, absolute_to, flags);
-
+		printf("ibvirt.c VirFree Call \n");//syscore
         VIR_FREE(absolute_to);
 
         if (ret < 0)
@@ -3058,7 +3058,7 @@ virDomainCoreDumpWithFormat(virDomainPtr domain, const char *to,
                             unsigned int dumpformat, unsigned int flags)
 {
     virConnectPtr conn;
-
+	printf("ibvirt.c virDomainCoreDumpWithFormat Call \n");//syscore
     VIR_DOMAIN_DEBUG(domain, "to=%s, dumpformat=%u, flags=%x",
                      to, dumpformat, flags);
 

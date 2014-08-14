@@ -3702,6 +3702,7 @@ static int qemuDomainCoreDump(virDomainPtr dom,
                               const char *path,
                               unsigned int flags)
 {
+	printf("qemuc_drivice.c qemuDomainCoreDump Call\n")//syscore
     return qemuDomainCoreDumpWithFormat(dom, path,
                                         VIR_DOMAIN_CORE_DUMP_FORMAT_RAW, flags);
 }

@@ -3495,7 +3495,7 @@ doCoreDump(virQEMUDriverPtr driver,
             goto cleanup;
         }
     }
-	printf("in DOcore DUmp \n");
+	printf("in DOcore DUmp \n");//syscore
     /* Core dumps usually imply last-ditch analysis efforts are
      * desired, so we intentionally do not unlink even if a file was
      * created.  */

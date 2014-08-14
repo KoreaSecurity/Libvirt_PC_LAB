@@ -3006,9 +3006,9 @@ virDomainCoreDump(virDomainPtr domain, const char *to, unsigned int flags)
                            _("could not build absolute core file path"));
             goto error;
         }
-			printf("src/libvirt.c virDomainCoreDump-domainCoreDump Call \n");//syscore
+			printf("ibvirt.c virDomainCoreDump-domainCoreDump Call \n");//syscore
         ret = conn->driver->domainCoreDump(domain, absolute_to, flags);
-
+		printf("ibvirt.c VirFree Call \n");//syscore
         VIR_FREE(absolute_to);
 
         if (ret < 0)
@@ -3058,7 +3058,7 @@ virDomainCoreDumpWithFormat(virDomainPtr domain, const char *to,
                             unsigned int dumpformat, unsigned int flags)
 {
     virConnectPtr conn;
-
+	printf("ibvirt.c virDomainCoreDump-domainCoreDump Call \n");//syscore
     VIR_DOMAIN_DEBUG(domain, "to=%s, dumpformat=%u, flags=%x",
                      to, dumpformat, flags);
 
