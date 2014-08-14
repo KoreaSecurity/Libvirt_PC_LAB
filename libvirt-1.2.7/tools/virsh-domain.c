@@ -4591,12 +4591,13 @@ doDump(void *opaque)
 	printf("doDump Call\n");//syscore
     sigemptyset(&sigmask);
     sigaddset(&sigmask, SIGINT);
+	printf("pthread_sigmask Call\n");//syscore
     if (pthread_sigmask(SIG_BLOCK, &sigmask, &oldsigmask) < 0)
         goto out_sig;
-
+	printf("vshCommandOptStringReq Call\n");//syscore
     if (vshCommandOptStringReq(ctl, cmd, "file", &to) < 0)
         goto out;
-
+	printf("vshCommandOptDomain Call\n");//syscore
     if (!(dom = vshCommandOptDomain(ctl, cmd, &name)))
         goto out;
 
@@ -4612,14 +4613,16 @@ doDump(void *opaque)
         flags |= VIR_DUMP_RESET;
     if (vshCommandOptBool(cmd, "memory-only"))
         flags |= VIR_DUMP_MEMORY_ONLY;
-	printf("vshCommandOptBool Call\n");//syscore
+	printf("vshCommandOptBool before in \n");
     if (vshCommandOptBool(cmd, "format")) {
+		printf("vshCommandOptBool Call\n");//syscore
         if (!(flags & VIR_DUMP_MEMORY_ONLY)) {
             vshError(ctl, "%s", _("--format only works with --memory-only"));
             goto out;
         }
-	printf("vshCommandOptString Call\n");//syscore
+
         if (vshCommandOptString(cmd, "format", &format)) {
+				printf("vshCommandOptString Call\n");//syscore
             if (STREQ(format, "kdump-zlib")) {
                 dumpformat = VIR_DOMAIN_CORE_DUMP_FORMAT_KDUMP_ZLIB;
             } else if (STREQ(format, "kdump-lzo")) {
@@ -4675,35 +4678,40 @@ cmdDump(vshControl *ctl, const vshCmd *cmd)
     virThread workerThread;
 	printf("cmdDump Call\n");//syscore
     if (!(dom = vshCommandOptDomain(ctl, cmd, &name)))
+	{
         return false;
 
-    if (vshCommandOptStringReq(ctl, cmd, "file", &to) < 0)
+	}
+    if (vshCommandOptStringReq(ctl, cmd, "file", &to) < 0){
         goto cleanup;
+	}
 
-    if (vshCommandOptBool(cmd, "verbose"))
+    if (vshCommandOptBool(cmd, "verbose")){
+
         verbose = true;
-
+	}
     if (pipe(p) < 0)
         goto cleanup;
 
     data.ctl = ctl;
     data.cmd = cmd;
     data.writefd = p[1];
-
+	printf("virThreadCreate Call\n"); //syscore
     if (virThreadCreate(&workerThread,
                         true,
                         doDump,
                         &data) < 0)
         goto cleanup;
-
+	printf("vshWatchJob Call\n"); //syscore
     ret = vshWatchJob(ctl, dom, verbose, p[0], 0, NULL, NULL, _("Dump"));
-
+	printf("virThreadJoin Call\n"); //syscore
     virThreadJoin(&workerThread);
 
     if (ret)
         vshPrint(ctl, _("\nDomain %s dumped to %s\n"), name, to);
 
  cleanup:
+	printf("cleanup Call\n"); //syscore
     virDomainFree(dom);
     VIR_FORCE_CLOSE(p[0]);
     VIR_FORCE_CLOSE(p[1]);
