@@ -2966,16 +2966,16 @@ int
 virDomainCoreDump(virDomainPtr domain, const char *to, unsigned int flags)
 {
     virConnectPtr conn;
-	printf("src/libvirt.c virDomainCoreDump Call \n");//syscore
+	printf("libvirt.c virDomainCoreDump Call \n");//syscore
     VIR_DOMAIN_DEBUG(domain, "to=%s, flags=%x", to, flags);
 
     virResetLastError();
 
     virCheckDomainReturn(domain, -1);
     conn = domain->conn;
-	printf("src/libvirt.c virCheckReadOnlyGoto Call \n");//syscore
+	printf("libvirt.c virCheckReadOnlyGoto Call \n");//syscore
     virCheckReadOnlyGoto(conn->flags, error);
-		printf("src/libvirt.c virCheckNonNullArgGoto Call \n");//syscore
+		printf("libvirt.c virCheckNonNullArgGoto Call \n");//syscore
     virCheckNonNullArgGoto(to, error);
 
     if ((flags & VIR_DUMP_CRASH) && (flags & VIR_DUMP_LIVE)) {
@@ -3006,7 +3006,7 @@ virDomainCoreDump(virDomainPtr domain, const char *to, unsigned int flags)
                            _("could not build absolute core file path"));
             goto error;
         }
-			printf("src/libvirt.c virDomainCoreDump-domainCoreDump Call \n");//syscore
+			printf("ibvirt.c virDomainCoreDump-domainCoreDump Call \n");//syscore
         ret = conn->driver->domainCoreDump(domain, absolute_to, flags);
 
         VIR_FREE(absolute_to);
