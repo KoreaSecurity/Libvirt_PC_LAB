@@ -4588,7 +4588,7 @@ doDump(void *opaque)
     unsigned int flags = 0;
     const char *format = NULL;
     unsigned int dumpformat = VIR_DOMAIN_CORE_DUMP_FORMAT_RAW;
-
+	printf("doDump Call\n")//syscore
     sigemptyset(&sigmask);
     sigaddset(&sigmask, SIGINT);
     if (pthread_sigmask(SIG_BLOCK, &sigmask, &oldsigmask) < 0)
@@ -4600,8 +4600,10 @@ doDump(void *opaque)
     if (!(dom = vshCommandOptDomain(ctl, cmd, &name)))
         goto out;
 
-    if (vshCommandOptBool(cmd, "live"))
+    if (vshCommandOptBool(cmd, "live")){
         flags |= VIR_DUMP_LIVE;
+		printf("live option \n"); //syscore	
+	}
     if (vshCommandOptBool(cmd, "crash"))
         flags |= VIR_DUMP_CRASH;
     if (vshCommandOptBool(cmd, "bypass-cache"))
@@ -4610,13 +4612,13 @@ doDump(void *opaque)
         flags |= VIR_DUMP_RESET;
     if (vshCommandOptBool(cmd, "memory-only"))
         flags |= VIR_DUMP_MEMORY_ONLY;
-
+	printf("vshCommandOptBool Call\n");//syscore
     if (vshCommandOptBool(cmd, "format")) {
         if (!(flags & VIR_DUMP_MEMORY_ONLY)) {
             vshError(ctl, "%s", _("--format only works with --memory-only"));
             goto out;
         }
-
+	printf("vshCommandOptString Call\n");//syscore
         if (vshCommandOptString(cmd, "format", &format)) {
             if (STREQ(format, "kdump-zlib")) {
                 dumpformat = VIR_DOMAIN_CORE_DUMP_FORMAT_KDUMP_ZLIB;
@@ -4634,14 +4636,16 @@ doDump(void *opaque)
             }
         }
     }
-
+	
     if (dumpformat != VIR_DOMAIN_CORE_DUMP_FORMAT_RAW) {
         if (virDomainCoreDumpWithFormat(dom, to, dumpformat, flags) < 0) {
+			printf("virDomainCoreDumpWithFormat Call\n");//syscore
             vshError(ctl, _("Failed to core dump domain %s to %s"), name, to);
             goto out;
         }
     } else {
         if (virDomainCoreDump(dom, to, flags) < 0) {
+			printf("virDomainCoreDump Call\n");//syscore
             vshError(ctl, _("Failed to core dump domain %s to %s"), name, to);
             goto out;
         }
@@ -4649,10 +4653,12 @@ doDump(void *opaque)
 
     ret = '0';
  out:
+	 printf("out Call\n");//syscore
     pthread_sigmask(SIG_SETMASK, &oldsigmask, NULL);
  out_sig:
-    if (dom)
-        virDomainFree(dom);
+    if (dom){
+		printf("out_sig Call\n");//syscore
+        virDomainFree(dom);}
     ignore_value(safewrite(data->writefd, &ret, sizeof(ret)));
 }
 
@@ -4667,17 +4673,14 @@ cmdDump(vshControl *ctl, const vshCmd *cmd)
     const char *to = NULL;
     vshCtrlData data;
     virThread workerThread;
-
+	printf("cmdDump Call\n");//syscore
     if (!(dom = vshCommandOptDomain(ctl, cmd, &name)))
-		printf("vshCommandOptDomain Call\n"); //syscore
         return false;
 
     if (vshCommandOptStringReq(ctl, cmd, "file", &to) < 0)
-		printf("vshCommandOptStringReq Call\n");//syscore
         goto cleanup;
 
     if (vshCommandOptBool(cmd, "verbose"))
-		printf("vshCommandOptBool Call\n");//syscore
         verbose = true;
 
     if (pipe(p) < 0)
@@ -4686,12 +4689,11 @@ cmdDump(vshControl *ctl, const vshCmd *cmd)
     data.ctl = ctl;
     data.cmd = cmd;
     data.writefd = p[1];
-printf("virThreadCreate Func Call \n") //syscore
+
     if (virThreadCreate(&workerThread,
                         true,
                         doDump,
                         &data) < 0)
-		printf("virThreadCreate Cleanup Call \n"); //syscore
         goto cleanup;
 
     ret = vshWatchJob(ctl, dom, verbose, p[0], 0, NULL, NULL, _("Dump"));
@@ -4702,7 +4704,6 @@ printf("virThreadCreate Func Call \n") //syscore
         vshPrint(ctl, _("\nDomain %s dumped to %s\n"), name, to);
 
  cleanup:
-	
     virDomainFree(dom);
     VIR_FORCE_CLOSE(p[0]);
     VIR_FORCE_CLOSE(p[1]);

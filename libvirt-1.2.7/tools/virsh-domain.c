@@ -4588,7 +4588,7 @@ doDump(void *opaque)
     unsigned int flags = 0;
     const char *format = NULL;
     unsigned int dumpformat = VIR_DOMAIN_CORE_DUMP_FORMAT_RAW;
-	printf("doDump Call\n")//syscore
+	printf("doDump Call\n");//syscore
     sigemptyset(&sigmask);
     sigaddset(&sigmask, SIGINT);
     if (pthread_sigmask(SIG_BLOCK, &sigmask, &oldsigmask) < 0)
@@ -4612,13 +4612,13 @@ doDump(void *opaque)
         flags |= VIR_DUMP_RESET;
     if (vshCommandOptBool(cmd, "memory-only"))
         flags |= VIR_DUMP_MEMORY_ONLY;
-	printf("vshCommandOptBool Call\n")//syscore
+	printf("vshCommandOptBool Call\n");//syscore
     if (vshCommandOptBool(cmd, "format")) {
         if (!(flags & VIR_DUMP_MEMORY_ONLY)) {
             vshError(ctl, "%s", _("--format only works with --memory-only"));
             goto out;
         }
-	printf("vshCommandOptString Call\n")//syscore
+	printf("vshCommandOptString Call\n");//syscore
         if (vshCommandOptString(cmd, "format", &format)) {
             if (STREQ(format, "kdump-zlib")) {
                 dumpformat = VIR_DOMAIN_CORE_DUMP_FORMAT_KDUMP_ZLIB;
@@ -4639,13 +4639,13 @@ doDump(void *opaque)
 	
     if (dumpformat != VIR_DOMAIN_CORE_DUMP_FORMAT_RAW) {
         if (virDomainCoreDumpWithFormat(dom, to, dumpformat, flags) < 0) {
-			printf("virDomainCoreDumpWithFormat Call\n")//syscore
+			printf("virDomainCoreDumpWithFormat Call\n");//syscore
             vshError(ctl, _("Failed to core dump domain %s to %s"), name, to);
             goto out;
         }
     } else {
         if (virDomainCoreDump(dom, to, flags) < 0) {
-			printf("virDomainCoreDump Call\n")//syscore
+			printf("virDomainCoreDump Call\n");//syscore
             vshError(ctl, _("Failed to core dump domain %s to %s"), name, to);
             goto out;
         }
@@ -4653,11 +4653,11 @@ doDump(void *opaque)
 
     ret = '0';
  out:
-	 printf("out Call\n")//syscore
+	 printf("out Call\n");//syscore
     pthread_sigmask(SIG_SETMASK, &oldsigmask, NULL);
  out_sig:
     if (dom){
-		printf("out_sig Call\n")//syscore
+		printf("out_sig Call\n");//syscore
         virDomainFree(dom);}
     ignore_value(safewrite(data->writefd, &ret, sizeof(ret)));
 }
